@@ -1,10 +1,14 @@
-package com.jdbc.example.statement.execute;
+package com.jdbc.example.statement.execute.ddl;
 
 import com.jdbc.example.util.ConnectionManager;
 
 import java.sql.SQLException;
 
-public class StatementExecuteDdlExamples {
+public class DdlExamples {
+
+    private DdlExamples() {
+    }
+
     public static void createTable() throws SQLException {
         String sql = """
                      create table if not exists employee(
