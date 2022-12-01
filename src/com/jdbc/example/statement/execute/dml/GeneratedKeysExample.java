@@ -2,7 +2,6 @@ package com.jdbc.example.statement.execute.dml;
 
 import com.jdbc.example.util.ConnectionManager;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
