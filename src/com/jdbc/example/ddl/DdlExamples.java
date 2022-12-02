@@ -1,4 +1,4 @@
-package com.jdbc.example.statement.execute.ddl;
+package com.jdbc.example.ddl;
 
 import com.jdbc.example.util.ConnectionManager;
 

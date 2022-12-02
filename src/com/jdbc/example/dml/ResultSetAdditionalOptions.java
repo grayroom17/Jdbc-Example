@@ -1,4 +1,4 @@
-package com.jdbc.example.statement.execute.dml;
+package com.jdbc.example.dml;
 
 import com.jdbc.example.util.ConnectionManager;
 

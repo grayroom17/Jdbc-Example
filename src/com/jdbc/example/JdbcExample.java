@@ -1,6 +1,6 @@
 package com.jdbc.example;
 
-import com.jdbc.example.statement.execute.dml.DmlExamples;
+import com.jdbc.example.dml.DmlExamples;
 
 import java.sql.SQLException;
 
