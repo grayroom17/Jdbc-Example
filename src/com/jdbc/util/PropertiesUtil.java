@@ -1,4 +1,4 @@
-package com.jdbc.example.util;
+package com.jdbc.util;
 
 import java.io.IOException;
 import java.util.Properties;

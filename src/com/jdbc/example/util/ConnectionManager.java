@@ -1,5 +1,7 @@
 package com.jdbc.example.util;
 
+import com.jdbc.util.PropertiesUtil;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
