@@ -55,7 +55,7 @@ public class ConnectionManager {
         }
     }
 
-    public static void closeConnections() {
+    public static void closePool() {
         originalConnections.forEach(connection -> {
             try {
                 connection.close();
