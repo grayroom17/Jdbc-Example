@@ -13,6 +13,9 @@ public class Employee {
     private Long salary;
     private byte[] photo;
 
+    public Employee() {
+    }
+
     public Employee(Long id,
                     String firstName,
                     String lastName,
@@ -27,6 +30,32 @@ public class Employee {
         this.departmentId = departmentId;
         this.salary = salary;
         this.photo = photo;
+    }
+
+    public Employee(Long id,
+                    String firstName,
+                    String lastName,
+                    LocalDate birthdate,
+                    Long departmentId,
+                    Long salary) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthdate = birthdate;
+        this.departmentId = departmentId;
+        this.salary = salary;
+    }
+
+    public Employee(String firstName,
+                    String lastName,
+                    LocalDate birthdate,
+                    Long departmentId,
+                    Long salary) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthdate = birthdate;
+        this.departmentId = departmentId;
+        this.salary = salary;
     }
 
     public Long getId() {

@@ -1,5 +1,7 @@
 package com.jdbc.util;
 
+import com.jdbc.exception.ConnectionManagerException;
+
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -35,23 +37,27 @@ public class ConnectionManager {
         }
     }
 
-    public static Connection openConnection() {
+    private ConnectionManager(){
+        throw new IllegalStateException("Utility Class");
+    }
+    public static Connection getConnection() {
+        try {
+            return pool.take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Thread.currentThread().interrupt();
+            throw new ConnectionManagerException(e);
+        }
+    }
+
+    private static Connection openConnection() {
         try {
             return DriverManager.getConnection(PropertiesUtil.get(URL),
                     PropertiesUtil.get(USER),
                     PropertiesUtil.get(PASSWORD));
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static Connection getConnection() {
-        try {
-            return pool.take();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new ConnectionManagerException(e);
         }
     }
 
@@ -61,7 +67,7 @@ public class ConnectionManager {
                 connection.close();
             } catch (SQLException e) {
                 e.printStackTrace();
-                throw new RuntimeException(e);
+                throw new ConnectionManagerException(e);
             }
         });
     }
