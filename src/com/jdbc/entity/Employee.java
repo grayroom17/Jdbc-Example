@@ -1,5 +1,7 @@
 package com.jdbc.entity;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Objects;
@@ -150,5 +152,15 @@ public class Employee {
                 salary);
         result = 31 * result + Arrays.hashCode(photo);
         return result;
+    }
+
+    public Employee buildByResultSet(ResultSet resultSet) throws SQLException {
+        this.setId(id);
+        this.setFirstName(resultSet.getString("first_name"));
+        this.setLastName(resultSet.getString("last_name"));
+        this.setBirthdate(LocalDate.from(resultSet.getTimestamp("birthdate").toLocalDateTime()));
+        this.setSalary(resultSet.getLong("salary"));
+        this.setDepartmentId(resultSet.getLong("department_id"));
+        return  this;
     }
 }
