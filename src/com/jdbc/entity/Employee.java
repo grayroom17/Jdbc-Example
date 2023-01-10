@@ -155,7 +155,7 @@ public class Employee {
     }
 
     public Employee buildByResultSet(ResultSet resultSet) throws SQLException {
-        this.setId(id);
+        this.setId(resultSet.getLong("id"));
         this.setFirstName(resultSet.getString("first_name"));
         this.setLastName(resultSet.getString("last_name"));
         this.setBirthdate(LocalDate.from(resultSet.getTimestamp("birthdate").toLocalDateTime()));

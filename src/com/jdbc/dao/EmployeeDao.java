@@ -1,5 +1,6 @@
 package com.jdbc.dao;
 
+import com.jdbc.EmployeeFilter;
 import com.jdbc.entity.Employee;
 import com.jdbc.exception.DaoException;
 import com.jdbc.util.ConnectionManager;
@@ -10,6 +11,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class EmployeeDao {
     private static volatile EmployeeDao instance;
@@ -19,7 +21,8 @@ public class EmployeeDao {
                                        """;
 
     private static final String FIND_ALL = """
-                                           select first_name,
+                                           select id,
+                                             first_name,
                                              last_name,
                                              birthdate,
                                              salary,
@@ -84,6 +87,67 @@ public class EmployeeDao {
     public List<Employee> findAll() {
         try (var connection = ConnectionManager.getConnection();
              var preparedStatement = connection.prepareStatement(FIND_ALL)) {
+
+            var resultSet = preparedStatement.executeQuery();
+
+            List<Employee> employees = new ArrayList<>();
+            while (resultSet.next()) {
+                var employee = new Employee();
+                employee.buildByResultSet(resultSet);
+                employees.add(employee);
+            }
+
+            return employees;
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+    }
+
+    public List<Employee> findAll(EmployeeFilter filter) {
+        List<Object> parameters = new ArrayList<>();
+        List<String> whereSql = new ArrayList<>();
+        if (filter.getFirstName() != null) {
+            whereSql.add("first_name like ?");
+            parameters.add("%" + filter.getFirstName() + "%");
+        }
+        if (filter.getLastName() != null) {
+            whereSql.add("last_name like ?");
+            parameters.add("%" + filter.getLastName() + "%");
+        }
+        if (filter.getBirthdate() != null) {
+            whereSql.add("birthdate = ?");
+            parameters.add(filter.getBirthdate());
+        }
+        if (filter.getDepartmentId() != null) {
+            whereSql.add("department_id = ?");
+            parameters.add(filter.getDepartmentId());
+        }
+        if (filter.getSalary() != null) {
+            whereSql.add("salary = ?");
+            parameters.add(filter.getSalary());
+        }
+        parameters.add(filter.getLimit());
+        parameters.add(filter.getOffset());
+
+        String additionalParameters;
+        if (!whereSql.isEmpty()) {
+            additionalParameters = whereSql.stream()
+                    .collect(Collectors.joining(" and ", " where ", " limit ? offset ? "));
+        } else {
+            additionalParameters = """
+                                   limit ?
+                                   offset ?
+                                   """;
+        }
+
+        var sql = FIND_ALL + additionalParameters;
+
+        try (var connection = ConnectionManager.getConnection();
+             var preparedStatement = connection.prepareStatement(sql)) {
+
+            for (int i = 0; i < parameters.size(); i++) {
+                preparedStatement.setObject(i + 1, parameters.get(i));
+            }
 
             var resultSet = preparedStatement.executeQuery();
 
