@@ -1,4 +1,4 @@
-package com.jdbc;
+package com.jdbc.filter;
 
 import java.time.LocalDate;
 

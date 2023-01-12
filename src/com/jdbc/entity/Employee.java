@@ -1,7 +1,5 @@
 package com.jdbc.entity;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Objects;
@@ -11,7 +9,7 @@ public class Employee {
     private String firstName;
     private String lastName;
     private LocalDate birthdate;
-    private Long departmentId;
+    private Department department;
     private Long salary;
     private byte[] photo;
 
@@ -22,14 +20,14 @@ public class Employee {
                     String firstName,
                     String lastName,
                     LocalDate birthdate,
-                    Long departmentId,
+                    Department department,
                     Long salary,
                     byte[] photo) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthdate = birthdate;
-        this.departmentId = departmentId;
+        this.department = department;
         this.salary = salary;
         this.photo = photo;
     }
@@ -38,25 +36,25 @@ public class Employee {
                     String firstName,
                     String lastName,
                     LocalDate birthdate,
-                    Long departmentId,
+                    Department department,
                     Long salary) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthdate = birthdate;
-        this.departmentId = departmentId;
+        this.department = department;
         this.salary = salary;
     }
 
     public Employee(String firstName,
                     String lastName,
                     LocalDate birthdate,
-                    Long departmentId,
+                    Department department,
                     Long salary) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthdate = birthdate;
-        this.departmentId = departmentId;
+        this.department = department;
         this.salary = salary;
     }
 
@@ -92,12 +90,12 @@ public class Employee {
         this.birthdate = birthdate;
     }
 
-    public Long getDepartmentId() {
-        return departmentId;
+    public Department getDepartment() {
+        return department;
     }
 
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 
     public Long getSalary() {
@@ -123,7 +121,7 @@ public class Employee {
                ", firstName='" + firstName + '\'' +
                ", lastName='" + lastName + '\'' +
                ", birthdate=" + birthdate +
-               ", departmentId=" + departmentId +
+               ", department=" + department +
                ", salary=" + salary +
                '}';
     }
@@ -137,7 +135,7 @@ public class Employee {
                && firstName.equals(employee.firstName)
                && lastName.equals(employee.lastName)
                && birthdate.equals(employee.birthdate)
-               && departmentId.equals(employee.departmentId)
+               && department.equals(employee.department)
                && salary.equals(employee.salary)
                && Arrays.equals(photo, employee.photo);
     }
@@ -148,19 +146,9 @@ public class Employee {
                 firstName,
                 lastName,
                 birthdate,
-                departmentId,
+                department,
                 salary);
         result = 31 * result + Arrays.hashCode(photo);
         return result;
-    }
-
-    public Employee buildByResultSet(ResultSet resultSet) throws SQLException {
-        this.setId(resultSet.getLong("id"));
-        this.setFirstName(resultSet.getString("first_name"));
-        this.setLastName(resultSet.getString("last_name"));
-        this.setBirthdate(LocalDate.from(resultSet.getTimestamp("birthdate").toLocalDateTime()));
-        this.setSalary(resultSet.getLong("salary"));
-        this.setDepartmentId(resultSet.getLong("department_id"));
-        return  this;
     }
 }

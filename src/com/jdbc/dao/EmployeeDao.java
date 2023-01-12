@@ -1,20 +1,24 @@
 package com.jdbc.dao;
 
-import com.jdbc.EmployeeFilter;
 import com.jdbc.entity.Employee;
 import com.jdbc.exception.DaoException;
+import com.jdbc.filter.EmployeeFilter;
 import com.jdbc.util.ConnectionManager;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class EmployeeDao {
+public class EmployeeDao implements Dao<Long, Employee> {
     private static volatile EmployeeDao instance;
+    private final DepartmentDao departmentDao = DepartmentDao.getInstance();
+
     private static final String SAVE = """
                                        insert into employee (first_name, last_name, birthdate, department_id, salary)
                                        values (?,?,?,?,?);
@@ -70,7 +74,7 @@ public class EmployeeDao {
             preparedStatement.setString(1, employee.getFirstName());
             preparedStatement.setString(2, employee.getLastName());
             preparedStatement.setTimestamp(3, Timestamp.valueOf(employee.getBirthdate().atStartOfDay()));
-            preparedStatement.setLong(4, employee.getDepartmentId());
+            preparedStatement.setObject(4, employee.getDepartment());
             preparedStatement.setLong(5, employee.getSalary());
 
             preparedStatement.executeUpdate();
@@ -92,8 +96,7 @@ public class EmployeeDao {
 
             List<Employee> employees = new ArrayList<>();
             while (resultSet.next()) {
-                var employee = new Employee();
-                employee.buildByResultSet(resultSet);
+                var employee = buildByResultSet(resultSet);
                 employees.add(employee);
             }
 
@@ -153,8 +156,7 @@ public class EmployeeDao {
 
             List<Employee> employees = new ArrayList<>();
             while (resultSet.next()) {
-                var employee = new Employee();
-                employee.buildByResultSet(resultSet);
+                var employee = buildByResultSet(resultSet);
                 employees.add(employee);
             }
 
@@ -173,8 +175,7 @@ public class EmployeeDao {
 
             Employee employee = null;
             if (resultSet.next()) {
-                employee = new Employee();
-                employee.buildByResultSet(resultSet);
+                employee = buildByResultSet(resultSet);
             }
 
             return Optional.ofNullable(employee);
@@ -190,7 +191,7 @@ public class EmployeeDao {
             preparedStatement.setString(2, employee.getLastName());
             preparedStatement.setTimestamp(3, Timestamp.valueOf(employee.getBirthdate().atStartOfDay()));
             preparedStatement.setLong(4, employee.getSalary());
-            preparedStatement.setLong(5, employee.getDepartmentId());
+            preparedStatement.setObject(5, employee.getDepartment());
             preparedStatement.setLong(6, employee.getId());
 
             preparedStatement.executeUpdate();
@@ -209,5 +210,15 @@ public class EmployeeDao {
         }
     }
 
-
+    public Employee buildByResultSet(ResultSet resultSet) throws SQLException {
+        var employee = new Employee();
+        employee.setId(resultSet.getLong("id"));
+        employee.setFirstName(resultSet.getString("first_name"));
+        employee.setLastName(resultSet.getString("last_name"));
+        employee.setBirthdate(LocalDate.from(resultSet.getTimestamp("birthdate").toLocalDateTime()));
+        employee.setSalary(resultSet.getLong("salary"));
+        var department = departmentDao.findById(resultSet.getLong("department_id")).orElse(null);
+        employee.setDepartment(department);
+        return employee;
+    }
 }
