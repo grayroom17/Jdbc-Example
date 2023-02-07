@@ -5,10 +5,7 @@ import main.java.jdbc.exception.DaoException;
 import main.java.jdbc.filter.EmployeeFilter;
 import main.java.jdbc.util.ConnectionManager;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +15,7 @@ import java.util.stream.Collectors;
 public class EmployeeDao implements Dao<Long, Employee> {
     private static volatile EmployeeDao instance;
     private final DepartmentDao departmentDao = DepartmentDao.getInstance();
+    private Connection connection = ConnectionManager.getConnection();
 
     private static final String SAVE = """
                                        insert into employee (first_name, last_name, birthdate, department_id, salary)
@@ -56,6 +54,14 @@ public class EmployeeDao implements Dao<Long, Employee> {
     private EmployeeDao() {
     }
 
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
+
     public static EmployeeDao getInstance() {
         if (instance == null) {
             synchronized (EmployeeDao.class) {
@@ -69,8 +75,7 @@ public class EmployeeDao implements Dao<Long, Employee> {
 
 
     public Employee save(Employee employee) {
-        try (final var connection = ConnectionManager.getConnection();
-             final var preparedStatement = connection.prepareStatement(SAVE, Statement.RETURN_GENERATED_KEYS)) {
+        try (var preparedStatement = connection.prepareStatement(SAVE, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, employee.getFirstName());
             preparedStatement.setString(2, employee.getLastName());
             preparedStatement.setTimestamp(3, Timestamp.valueOf(employee.getBirthdate().atStartOfDay()));
@@ -89,8 +94,7 @@ public class EmployeeDao implements Dao<Long, Employee> {
     }
 
     public List<Employee> findAll() {
-        try (var connection = ConnectionManager.getConnection();
-             var preparedStatement = connection.prepareStatement(FIND_ALL)) {
+        try (var preparedStatement = connection.prepareStatement(FIND_ALL)) {
 
             var resultSet = preparedStatement.executeQuery();
 
@@ -145,8 +149,7 @@ public class EmployeeDao implements Dao<Long, Employee> {
 
         var sql = FIND_ALL + additionalParameters;
 
-        try (var connection = ConnectionManager.getConnection();
-             var preparedStatement = connection.prepareStatement(sql)) {
+        try (var preparedStatement = connection.prepareStatement(sql)) {
 
             for (int i = 0; i < parameters.size(); i++) {
                 preparedStatement.setObject(i + 1, parameters.get(i));
@@ -167,8 +170,7 @@ public class EmployeeDao implements Dao<Long, Employee> {
     }
 
     public Optional<Employee> findById(Long id) {
-        try (var connection = ConnectionManager.getConnection();
-             var preparedStatement = connection.prepareStatement(FIND_BY_ID)) {
+        try (var preparedStatement = connection.prepareStatement(FIND_BY_ID)) {
             preparedStatement.setLong(1, id);
 
             var resultSet = preparedStatement.executeQuery();
@@ -185,8 +187,7 @@ public class EmployeeDao implements Dao<Long, Employee> {
     }
 
     public void updateById(Employee employee) {
-        try (var connection = ConnectionManager.getConnection();
-             final var preparedStatement = connection.prepareStatement(UPDATE)) {
+        try (var preparedStatement = connection.prepareStatement(UPDATE)) {
             preparedStatement.setString(1, employee.getFirstName());
             preparedStatement.setString(2, employee.getLastName());
             preparedStatement.setTimestamp(3, Timestamp.valueOf(employee.getBirthdate().atStartOfDay()));
@@ -201,8 +202,7 @@ public class EmployeeDao implements Dao<Long, Employee> {
     }
 
     public boolean deleteById(Long id) {
-        try (var connection = ConnectionManager.getConnection();
-             final var preparedStatement = connection.prepareStatement(DELETE)) {
+        try (var preparedStatement = connection.prepareStatement(DELETE)) {
             preparedStatement.setLong(1, id);
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {

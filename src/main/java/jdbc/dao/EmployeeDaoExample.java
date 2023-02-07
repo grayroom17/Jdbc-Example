@@ -1,6 +1,5 @@
-package main.java.jdbc;
+package main.java.jdbc.dao;
 
-import main.java.jdbc.dao.EmployeeDao;
 import main.java.jdbc.entity.Employee;
 import main.java.jdbc.filter.EmployeeFilter;
 import org.slf4j.Logger;
@@ -8,8 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 
-public class EmployeeDaoTest {
-    private static final Logger LOG = LoggerFactory.getLogger(EmployeeDaoTest.class);
+public class EmployeeDaoExample {
+    private static final Logger LOG = LoggerFactory.getLogger(EmployeeDaoExample.class);
 
     public static void main(String[] args) {
         var employeeDao = EmployeeDao.getInstance();

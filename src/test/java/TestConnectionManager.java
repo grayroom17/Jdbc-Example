@@ -1,4 +1,4 @@
-package main.java.jdbc.example.util;
+package test.java;
 
 import main.java.jdbc.util.PropertiesUtil;
 
@@ -6,15 +6,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public final class ConnectionManager {
-    private static final String URL = "db.example.url";
-    private static final String USER = "db.example.user";
-    private static final String PASSWORD = "db.example.password";
+public class TestConnectionManager {
+    private static final String URL = "db.test.url";
+    private static final String USER = "db.test.user";
+    private static final String PASSWORD = "db.test.password";
 
-    private ConnectionManager() {
+    private TestConnectionManager() {
     }
 
-    public static Connection openConnection() {
+    public static Connection getConnection() {
         try {
             return DriverManager.getConnection(PropertiesUtil.get(URL),
                     PropertiesUtil.get(USER),

@@ -37,9 +37,10 @@ public class ConnectionManager {
         }
     }
 
-    private ConnectionManager(){
+    private ConnectionManager() {
         throw new IllegalStateException("Utility Class");
     }
+
     public static Connection getConnection() {
         try {
             return pool.take();

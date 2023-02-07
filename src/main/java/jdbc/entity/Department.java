@@ -2,6 +2,7 @@ package main.java.jdbc.entity;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class Department {
@@ -15,6 +16,12 @@ public class Department {
 
     public Department(Long id, String name, String city, Long locationId) {
         this.id = id;
+        this.name = name;
+        this.city = city;
+        this.locationId = locationId;
+    }
+
+    public Department(String name, String city, Long locationId) {
         this.name = name;
         this.city = city;
         this.locationId = locationId;
@@ -73,13 +80,5 @@ public class Department {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, city, locationId);
-    }
-
-    public Department buildByResultSet(ResultSet resultSet) throws SQLException {
-        this.setId(resultSet.getLong("id"));
-        this.setName(resultSet.getString("name"));
-        this.setCity(resultSet.getString("city"));
-        this.setLocationId(resultSet.getLong("location_id"));
-        return this;
     }
 }
