@@ -35,11 +35,7 @@ class EmployeeDaoTest {
         var saved = employeeDao.save(testEmployee);
         assertNotNull(saved);
         assertNotNull(saved.getId());
-        assertEquals(testEmployee.getFirstName(), saved.getFirstName());
-        assertEquals(testEmployee.getLastName(), saved.getLastName());
-        assertEquals(testEmployee.getBirthdate(), saved.getBirthdate());
-        assertEquals(testEmployee.getSalary(), saved.getSalary());
-        assertEquals(testEmployee.getDepartment(), saved.getDepartment());
+        assertEmployeeFields(testEmployee, saved);
         var optionalEmployee = employeeDao.findById(saved.getId());
         assertTrue(optionalEmployee.isPresent());
         var employee = optionalEmployee.orElseThrow();
@@ -74,11 +70,7 @@ class EmployeeDaoTest {
         assertNotNull(founded);
         assertFalse(founded.isEmpty());
         assertEquals(1, founded.size());
-        assertEquals(saved.getId(), founded.get(0).getId());
-        assertEquals(saved.getFirstName(), founded.get(0).getFirstName());
-        assertEquals(saved.getLastName(), founded.get(0).getLastName());
-        assertEquals(saved.getBirthdate(), founded.get(0).getBirthdate());
-        assertEquals(saved.getSalary(), founded.get(0).getSalary());
+        assertEmployeeFields(saved, founded.get(0));
         employeeDao.deleteById(saved.getId());
     }
 
@@ -138,5 +130,6 @@ class EmployeeDaoTest {
         assertEquals(expected.getLastName(), actual.getLastName());
         assertEquals(expected.getBirthdate(), actual.getBirthdate());
         assertEquals(expected.getSalary(), actual.getSalary());
+        assertEquals(expected.getDepartment(), actual.getDepartment());
     }
 }
