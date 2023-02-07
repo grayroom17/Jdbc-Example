@@ -210,7 +210,7 @@ public class EmployeeDao implements Dao<Long, Employee> {
         }
     }
 
-    public Employee buildByResultSet(ResultSet resultSet) throws SQLException {
+    private Employee buildByResultSet(ResultSet resultSet) throws SQLException {
         var employee = new Employee();
         employee.setId(resultSet.getLong("id"));
         employee.setFirstName(resultSet.getString("first_name"));
