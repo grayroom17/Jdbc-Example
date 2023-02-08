@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,7 +30,7 @@ class EmployeeDaoTest {
     @BeforeEach
     public void setup() {
         try (var statement = connection.createStatement()) {
-            statement.execute(new String(EmployeeDaoTest.class.getClassLoader().getResourceAsStream(DATA_SQL).readAllBytes()));
+            statement.execute(new String(Objects.requireNonNull(EmployeeDaoTest.class.getClassLoader().getResourceAsStream(DATA_SQL)).readAllBytes()));
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }

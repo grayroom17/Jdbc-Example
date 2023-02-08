@@ -4,12 +4,14 @@ import main.java.jdbc.dao.DepartmentDao;
 import main.java.jdbc.dao.EmployeeDao;
 import main.java.jdbc.entity.Department;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,7 +34,7 @@ class DepartmentDaoTest {
     @BeforeEach
     public void setup() {
         try (var statement = connection.createStatement()) {
-            statement.execute(new String(EmployeeDaoTest.class.getClassLoader().getResourceAsStream(DATA_SQL).readAllBytes()));
+            statement.execute(new String(Objects.requireNonNull(EmployeeDaoTest.class.getClassLoader().getResourceAsStream(DATA_SQL)).readAllBytes()));
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
@@ -49,6 +51,9 @@ class DepartmentDaoTest {
 
     @Test
     void getInstance() {
+        var expected = DepartmentDao.getInstance();
+        var actual = DepartmentDao.getInstance();
+        Assertions.assertSame(expected, actual);
     }
 
     @Test
