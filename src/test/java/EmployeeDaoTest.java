@@ -78,6 +78,7 @@ class EmployeeDaoTest {
         var employees = employeeDao.findAll();
         assertNotNull(employees);
         assertFalse(employees.isEmpty());
+        assertEquals(12, employees.size());
     }
 
     @Test

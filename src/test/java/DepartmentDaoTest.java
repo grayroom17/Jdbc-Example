@@ -1,6 +1,7 @@
 package test.java;
 
 import main.java.jdbc.dao.DepartmentDao;
+import main.java.jdbc.dao.EmployeeDao;
 import main.java.jdbc.entity.Department;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,18 +10,23 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class DepartmentDaoTest {
     public static final String DATA_SQL = "data.sql";
     private static Connection connection;
-    private static DepartmentDao departmentDao;
+    private static DepartmentDao dao;
+    private static EmployeeDao employeeDao;
+
 
     {
         connection = TestConnectionManager.getConnection();
-        departmentDao = DepartmentDao.getInstance();
-        departmentDao.setConnection(connection);
+        dao = DepartmentDao.getInstance();
+        employeeDao = EmployeeDao.getInstance();
+        dao.setConnection(connection);
+        employeeDao.setConnection(connection);
     }
 
     @BeforeEach
@@ -48,23 +54,17 @@ class DepartmentDaoTest {
     @Test
     void save() {
         var testDepartment = new Department("test", "test", null);
-//        var employeeFilter = new EmployeeFilter(500,
-//                0,
-//                testDepartment.getFirstName(),
-//                testDepartment.getLastName(),
-//                testDepartment.getBirthdate(),
-//                null,
-//                testDepartment.getSalary());
-        var founded = departmentDao.findAll();
+        var founded = dao.findAll();
         assertFalse(founded.stream().anyMatch(department -> department.getName().equals("test")
                                                             && department.getCity().equals("test")
                                                             && department.getLocationId() == null));
 
-        var saved = departmentDao.save(testDepartment);
+        var saved = dao.save(testDepartment);
+
         assertNotNull(saved);
         assertNotNull(saved.getId());
         assertDepartmentFields(testDepartment, saved);
-        var optionalDepartment = departmentDao.findById(saved.getId());
+        var optionalDepartment = dao.findById(saved.getId());
         assertTrue(optionalDepartment.isPresent());
         var department = optionalDepartment.orElseThrow();
         assertDepartmentFields(saved, department);
@@ -72,18 +72,58 @@ class DepartmentDaoTest {
 
     @Test
     void findAll() {
+        var departments = dao.findAll();
+
+        assertNotNull(departments);
+        assertFalse(departments.isEmpty());
+        assertEquals(6, departments.size());
     }
 
     @Test
     void findById() {
+        var founded = dao.findById(1L);
+
+        assertTrue(founded.isPresent());
+        var department = founded.orElseThrow();
+        assertEquals(1L, department.getId());
+        assertEquals("Testing", department.getName());
+        assertEquals("Melbourne", department.getCity());
+        assertNull(department.getLocationId());
     }
 
     @Test
     void updateById() {
+        var department = new Department(1L, "TestName", "TestCity", null);
+        var founded = dao.findById(1L).orElseThrow();
+        assertEquals(1L, founded.getId());
+        assertNotEquals(department.getName(), founded.getName());
+        assertNotEquals(department.getCity(), founded.getCity());
+        assertEquals(department.getLocationId(), founded.getLocationId());
+
+        dao.updateById(department);
+
+        founded = dao.findById(1L).orElseThrow();
+        assertEquals(1L, founded.getId());
+        assertEquals(department.getName(), founded.getName());
+        assertEquals(department.getCity(), founded.getCity());
+        assertEquals(department.getLocationId(), founded.getLocationId());
+
     }
 
     @Test
     void deleteById() {
+        var optionalDepartment = dao.findById(1L);
+        assertTrue(optionalDepartment.isPresent());
+        var employees = employeeDao.findAll().stream()
+                .filter(employee -> employee.getDepartment().getId().equals(1L))
+                .collect(Collectors.toList());
+        employees.forEach(employee -> employeeDao.deleteById(employee.getId()));
+
+        var result = dao.deleteById(1L);
+
+        assertTrue(result);
+        optionalDepartment = dao.findById(1L);
+        assertFalse(optionalDepartment.isPresent());
     }
 
     private void assertDepartmentFields(Department expected, Department actual) {

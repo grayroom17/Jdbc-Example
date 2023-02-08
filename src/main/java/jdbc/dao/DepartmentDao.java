@@ -37,7 +37,7 @@ public class DepartmentDao implements Dao<Long, Department> {
                                          SET name = ?,
                                          city = ?,
                                          location_id = ?
-                                         where location_id = ?
+                                         where id = ?
                                          """;
 
     private static final String DELETE = """
@@ -124,7 +124,8 @@ public class DepartmentDao implements Dao<Long, Department> {
         try (var preparedStatement = connection.prepareStatement(UPDATE)) {
             preparedStatement.setString(1, entity.getName());
             preparedStatement.setString(2, entity.getCity());
-            preparedStatement.setLong(3, entity.getLocationId());
+            preparedStatement.setObject(3, entity.getLocationId());
+            preparedStatement.setObject(4, entity.getId());
 
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
