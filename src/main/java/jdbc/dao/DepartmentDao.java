@@ -5,15 +5,16 @@ import main.java.jdbc.exception.DaoException;
 import main.java.jdbc.util.ConnectionManager;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+
 public class DepartmentDao implements Dao<Long, Department> {
-    private static volatile DepartmentDao instance;
+    private static DepartmentDao instance;
     private Connection connection = ConnectionManager.getConnection();
 
     private static final String SAVE = """
@@ -50,11 +51,7 @@ public class DepartmentDao implements Dao<Long, Department> {
 
     public static DepartmentDao getInstance() {
         if (instance == null) {
-            synchronized (EmployeeDao.class) {
-                if (instance == null) {
-                    instance = new DepartmentDao();
-                }
-            }
+            instance = new DepartmentDao();
         }
         return instance;
     }
@@ -69,7 +66,7 @@ public class DepartmentDao implements Dao<Long, Department> {
 
     @Override
     public Department save(Department department) {
-        try (var preparedStatement = connection.prepareStatement(SAVE, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (var preparedStatement = connection.prepareStatement(SAVE, RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, department.getName());
             preparedStatement.setString(2, department.getCity());
             preparedStatement.setObject(3, department.getLocationId());

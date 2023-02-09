@@ -18,22 +18,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class EmployeeDaoTest {
     public static final String DATA_SQL = "data.sql";
-    private static Connection connection;
-    private static EmployeeDao employeeDao;
+    private Connection connection;
+    private EmployeeDao dao;
 
-    {
-        connection = TestConnectionManager.getConnection();
-        employeeDao = EmployeeDao.getInstance();
-        employeeDao.setConnection(connection);
-    }
 
     @BeforeEach
     public void setup() {
+        initConnection();
         try (var statement = connection.createStatement()) {
             statement.execute(new String(Objects.requireNonNull(EmployeeDaoTest.class.getClassLoader().getResourceAsStream(DATA_SQL)).readAllBytes()));
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void initConnection() {
+        connection = TestConnectionManager.getConnection();
+        dao = EmployeeDao.getInstance();
+        dao.setConnection(connection);
     }
 
     @AfterEach
@@ -62,13 +64,13 @@ class EmployeeDaoTest {
                 testEmployee.getBirthdate(),
                 null,
                 testEmployee.getSalary());
-        var founded = employeeDao.findAll(employeeFilter);
+        var founded = dao.findAll(employeeFilter);
         assertTrue(founded.isEmpty());
-        var saved = employeeDao.save(testEmployee);
+        var saved = dao.save(testEmployee);
         assertNotNull(saved);
         assertNotNull(saved.getId());
         assertEmployeeFields(testEmployee, saved);
-        var optionalEmployee = employeeDao.findById(saved.getId());
+        var optionalEmployee = dao.findById(saved.getId());
         assertTrue(optionalEmployee.isPresent());
         var employee = optionalEmployee.orElseThrow();
         assertEmployeeFields(saved, employee);
@@ -76,7 +78,7 @@ class EmployeeDaoTest {
 
     @Test
     void findAll() {
-        var employees = employeeDao.findAll();
+        var employees = dao.findAll();
         assertNotNull(employees);
         assertFalse(employees.isEmpty());
         assertEquals(12, employees.size());
@@ -84,7 +86,7 @@ class EmployeeDaoTest {
 
     @Test
     void findAllWithFilter() {
-        var saved = employeeDao.save(new Employee("test",
+        var saved = dao.save(new Employee("test",
                 "test",
                 LocalDate.of(1953, 3, 15),
                 null,
@@ -96,7 +98,7 @@ class EmployeeDaoTest {
                 saved.getBirthdate(),
                 null,
                 saved.getSalary());
-        var founded = employeeDao.findAll(employeeFilter);
+        var founded = dao.findAll(employeeFilter);
         assertNotNull(founded);
         assertFalse(founded.isEmpty());
         assertEquals(1, founded.size());
@@ -105,12 +107,12 @@ class EmployeeDaoTest {
 
     @Test
     void findById() {
-        var saved = employeeDao.save(new Employee("test",
+        var saved = dao.save(new Employee("test",
                 "test",
                 LocalDate.of(1953, 3, 15),
                 null,
                 9999999L));
-        var optionalEmployee = employeeDao.findById(saved.getId());
+        var optionalEmployee = dao.findById(saved.getId());
         assertTrue(optionalEmployee.isPresent());
         var employee = optionalEmployee.orElseThrow();
         assertEmployeeFields(saved, employee);
@@ -118,7 +120,7 @@ class EmployeeDaoTest {
 
     @Test
     void updateById() {
-        var saved = employeeDao.save(new Employee("test",
+        var saved = dao.save(new Employee("test",
                 "test",
                 LocalDate.of(1953, 3, 15),
                 null,
@@ -127,8 +129,8 @@ class EmployeeDaoTest {
         saved.setLastName("testLastName");
         saved.setBirthdate(LocalDate.of(1999, 1, 1));
         saved.setSalary(500L);
-        employeeDao.updateById(saved);
-        var optionalEmployee = employeeDao.findById(saved.getId());
+        dao.updateById(saved);
+        var optionalEmployee = dao.findById(saved.getId());
         assertTrue(optionalEmployee.isPresent());
         var employee = optionalEmployee.orElseThrow();
         assertEmployeeFields(saved, employee);
@@ -136,16 +138,16 @@ class EmployeeDaoTest {
 
     @Test
     void deleteById() {
-        var saved = employeeDao.save(new Employee("test",
+        var saved = dao.save(new Employee("test",
                 "test",
                 LocalDate.of(1953, 3, 15),
                 null,
                 9999999L));
-        var founded = employeeDao.findById(saved.getId());
+        var founded = dao.findById(saved.getId());
         assertTrue(founded.isPresent());
-        var result = employeeDao.deleteById(saved.getId());
+        var result = dao.deleteById(saved.getId());
         assertTrue(result);
-        founded = employeeDao.findById(saved.getId());
+        founded = dao.findById(saved.getId());
         assertFalse(founded.isPresent());
     }
 

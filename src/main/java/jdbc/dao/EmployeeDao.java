@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EmployeeDao implements Dao<Long, Employee> {
-    private static volatile EmployeeDao instance;
+    private static EmployeeDao instance;
     private final DepartmentDao departmentDao = DepartmentDao.getInstance();
     private Connection connection = ConnectionManager.getConnection();
 
@@ -62,13 +62,9 @@ public class EmployeeDao implements Dao<Long, Employee> {
         this.connection = connection;
     }
 
-    public static EmployeeDao getInstance() {
+    public static synchronized EmployeeDao getInstance() {
         if (instance == null) {
-            synchronized (EmployeeDao.class) {
-                if (instance == null) {
-                    instance = new EmployeeDao();
-                }
-            }
+            instance = new EmployeeDao();
         }
         return instance;
     }

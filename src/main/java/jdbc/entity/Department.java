@@ -1,8 +1,5 @@
 package main.java.jdbc.entity;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.Objects;
 
 public class Department {

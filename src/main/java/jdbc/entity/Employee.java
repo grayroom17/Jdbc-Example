@@ -16,6 +16,7 @@ public class Employee {
     public Employee() {
     }
 
+    @SuppressWarnings("unused")
     public Employee(Long id,
                     String firstName,
                     String lastName,
@@ -32,6 +33,7 @@ public class Employee {
         this.photo = photo;
     }
 
+    @SuppressWarnings("unused")
     public Employee(Long id,
                     String firstName,
                     String lastName,
@@ -106,10 +108,12 @@ public class Employee {
         this.salary = salary;
     }
 
+    @SuppressWarnings("unused")
     public byte[] getPhoto() {
         return photo;
     }
 
+    @SuppressWarnings("unused")
     public void setPhoto(byte[] photo) {
         this.photo = photo;
     }

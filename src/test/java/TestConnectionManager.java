@@ -1,5 +1,6 @@
 package test.java;
 
+import main.java.jdbc.exception.DaoException;
 import main.java.jdbc.util.PropertiesUtil;
 
 import java.sql.Connection;
@@ -20,7 +21,7 @@ public class TestConnectionManager {
                     PropertiesUtil.get(USER),
                     PropertiesUtil.get(PASSWORD));
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 }

@@ -3,6 +3,7 @@ package test.java;
 import main.java.jdbc.dao.DepartmentDao;
 import main.java.jdbc.dao.EmployeeDao;
 import main.java.jdbc.entity.Department;
+import main.java.jdbc.exception.DaoException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,21 +19,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DepartmentDaoTest {
     public static final String DATA_SQL = "data.sql";
-    private static Connection connection;
-    private static DepartmentDao dao;
-    private static EmployeeDao employeeDao;
+    private Connection connection;
+    private DepartmentDao dao;
+    private EmployeeDao employeeDao;
 
-
-    {
-        connection = TestConnectionManager.getConnection();
-        dao = DepartmentDao.getInstance();
-        employeeDao = EmployeeDao.getInstance();
-        dao.setConnection(connection);
-        employeeDao.setConnection(connection);
-    }
 
     @BeforeEach
     public void setup() {
+        initConnection();
         try (var statement = connection.createStatement()) {
             statement.execute(new String(Objects.requireNonNull(EmployeeDaoTest.class.getClassLoader().getResourceAsStream(DATA_SQL)).readAllBytes()));
         } catch (SQLException | IOException e) {
@@ -40,12 +34,20 @@ class DepartmentDaoTest {
         }
     }
 
+    private void initConnection() {
+        connection = TestConnectionManager.getConnection();
+        dao = DepartmentDao.getInstance();
+        employeeDao = EmployeeDao.getInstance();
+        dao.setConnection(connection);
+        employeeDao.setConnection(connection);
+    }
+
     @AfterEach
     public void tearDown() {
         try {
             connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DaoException(e);
         }
     }
 
